@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "hack/cmd"
+import "github.com/kris-nova/hack/cmd"
 
 func main() {
 	cmd.Execute()

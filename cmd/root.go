@@ -26,9 +26,27 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "hack",
 	Short: "Utility for debugging and hacking on Kubernetes",
-	Long:  `Use hack to debug, explore, exploit and otherwise own a Kubernetes cluster.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
+	Long:  `
+
+ __                            __       
+|  \                          |  \      
+| $$____    ______    _______ | $$   __ 
+| $$    \  |      \  /       \| $$  /  \      Author:
+| $$$$$$$\  \$$$$$$\|  $$$$$$$| $$_/  $$      Kris Nóva <kris@nivenly.com>
+| $$  | $$ /      $$| $$      | $$   $$   
+| $$  | $$|  $$$$$$$| $$_____ | $$$$$$\       Bugs:
+| $$  | $$ \$$    $$ \$$     \| $$  \$$\      lol
+ \$$   \$$  \$$$$$$$  \$$$$$$$ \$$   \$$
+
+
+----------------------------------------------------------------------------
+Use hack to debug, explore, exploit and otherwise own a Kubernetes cluster.
+----------------------------------------------------------------------------
+
+[EXAMPLES]
+ hack it # Will run the default "hack" image in Kubernetes and exec into the pod
+`,
+
 	//	Run: func(cmd *cobra.Command, args []string) { },
 }
 
