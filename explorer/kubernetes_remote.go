@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-type ITOptions struct {
+type RemoteExplorerOptions struct {
 	KubeconfigPath string
 	Namespace string
 	Image string
@@ -24,15 +24,16 @@ type ITOptions struct {
 	UserID int
 	PrivilegeEscalation bool
 	MountProc bool
+	Name string
 }
 
 type RemoteExplorer struct {
 	ClientSet kubernetes.Clientset
 	Config rest.Config
-	Options *ITOptions
+	Options *RemoteExplorerOptions
 }
 
-func NewRemoteExplorer (clientSet kubernetes.Clientset, config rest.Config, options *ITOptions) *RemoteExplorer{
+func NewRemoteExplorer (clientSet kubernetes.Clientset, config rest.Config, options *RemoteExplorerOptions) *RemoteExplorer{
 	return &RemoteExplorer{
 		ClientSet: clientSet,
 		Config: config,
@@ -100,6 +101,9 @@ func (e *RemoteExplorer) Attach(profile *ProbedProfile, namespace, image, shell 
 	 * Set up the attachment. Here we define the Pod and declare our pod configuration.
 	 */
 	name := newName()
+	if e.Options.Name != "" {
+		name = e.Options.Name
+	}
 	logger.Always("Creating pod: %s", name)
 
 	/**
@@ -144,6 +148,7 @@ func (e *RemoteExplorer) Attach(profile *ProbedProfile, namespace, image, shell 
 	 */
 	pod, err := e.ClientSet.CoreV1().Pods(namespace).Create(context.Background(), pod, options)
 	// Here we defer the pod deletion to the end of the function
+	e.DeferDeletePod(name, namespace)
 	defer func() {
 		logger.Always("Deleting pod: %s", name)
 		err := e.ClientSet.CoreV1().Pods(namespace).Delete(context.Background(), name, metav1.DeleteOptions{})
@@ -160,9 +165,6 @@ func (e *RemoteExplorer) Attach(profile *ProbedProfile, namespace, image, shell 
 	{
 		i := 1000 // Try for 3000 seconds
 		for {
-			if BreakNow {
-				return fmt.Errorf("unable to attach to pod %s", name)
-			}
 			if i == 0 {
 				return fmt.Errorf("unable to attach to pod %s", name)
 			}

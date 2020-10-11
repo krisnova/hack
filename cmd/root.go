@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/kris-nova/logger"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -57,5 +58,5 @@ func Execute() {
 }
 
 func init() {
-	//flags
+	rootCmd.PersistentFlags().IntVarP(&logger.Level, "verbosity", "v", 3, "Verbosity level")
 }

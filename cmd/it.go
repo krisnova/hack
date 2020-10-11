@@ -44,8 +44,8 @@ in a Kubernetes cluster with as many privileges as possible.
 			os.Exit(2)
 		}
 		workingPath := filepath.Join(home, ".kube", "config")
-		opt.KubeconfigPath = workingPath // Update the manipulated path
-		err := InteractiveTTY(opt)
+		itopt.KubeconfigPath = workingPath // Update the manipulated path
+		err := InteractiveTTY(itopt)
 		if err != nil {
 			logger.Critical(err.Error())
 			os.Exit(1)
@@ -57,27 +57,28 @@ in a Kubernetes cluster with as many privileges as possible.
 
 func init() {
 	rootCmd.AddCommand(itCmd)
-	itCmd.Flags().IntVarP(&logger.Level, "verbosity", "v", 4, "Verbosity level")
-	itCmd.Flags().StringVarP(&opt.KubeconfigPath, "kubeconfig", "k", "~/.kube/config", "The path on the local filesystem to read a Kube config file from.")
-	itCmd.Flags().StringVarP(&opt.Namespace, "namespace", "n", "default", "The namespace in Kubernetes to attach to.")
-	itCmd.Flags().StringVarP(&opt.Image, "image", "i", "krisnova/hack:latest", "The container image to run.")
-	itCmd.Flags().StringVarP(&opt.Shell, "shell", "s", "bash", "The path to the shell or command to run EX: /bin/bash")
-	itCmd.Flags().IntVarP(&opt.GroupID, "gid", "g", 0, "The group ID (GID) to run the container with.")
-	itCmd.Flags().IntVarP(&opt.GroupID, "uid", "u", 0, "The user ID (UID) to run the container with.")
-	itCmd.Flags().BoolVarP(&opt.PrivilegeEscalation, "privileged", "p", true, "Controls both the privileged and allowPrivilegedEscalation bools")
-	itCmd.Flags().BoolVarP(&opt.MountProc, "mount-proc", "m", true, "Controls the masking for proc. If enabled will attempt to mount /proc from the host.")
+	itCmd.Flags().StringVarP(&itopt.KubeconfigPath, "kubeconfig", "k", "~/.kube/config", "The path on the local filesystem to read a Kube config file from.")
+	itCmd.Flags().StringVarP(&itopt.Namespace, "namespace", "n", "default", "The namespace in Kubernetes to attach to.")
+	itCmd.Flags().StringVarP(&itopt.Image, "image", "i", "krisnova/hack:latest", "The container image to run.")
+	itCmd.Flags().StringVarP(&itopt.Shell, "shell", "s", "/bin/bash", "The path to the shell or command to run EX: /bin/bash")
+	itCmd.Flags().StringVarP(&itopt.Name, "name", "N", "", "Name to use for the pod.")
+	itCmd.Flags().IntVarP(&itopt.GroupID, "gid", "g", 0, "The group ID (GID) to run the container with.")
+	itCmd.Flags().IntVarP(&itopt.GroupID, "uid", "u", 0, "The user ID (UID) to run the container with.")
+	itCmd.Flags().BoolVarP(&itopt.PrivilegeEscalation, "privileged", "p", true, "Controls both the privileged and allowPrivilegedEscalation bools")
+	itCmd.Flags().BoolVarP(&itopt.MountProc, "mount-proc", "m", true, "Controls the masking for proc. If enabled will attempt to mount /proc from the host.")
 }
 
 
 
-var opt = &explorer.ITOptions{}
+var itopt = &explorer.RemoteExplorerOptions{}
 
 /**
  * InteractiveTTY is an opinionated way to enter a pod in a Kubernetes cluster.
  */
-func InteractiveTTY(opt *explorer.ITOptions) error {
+func InteractiveTTY(itopt *explorer.RemoteExplorerOptions) error {
+	logger.Always("Interactive TTY")
 	explorer.HandleSignals()
-	config, err := clientcmd.BuildConfigFromFlags("", opt.KubeconfigPath)
+	config, err := clientcmd.BuildConfigFromFlags("", itopt.KubeconfigPath)
 	if err != nil {
 		return err
 	}
@@ -85,12 +86,12 @@ func InteractiveTTY(opt *explorer.ITOptions) error {
 	if err != nil {
 		return err
 	}
-	remoteEx := explorer.NewRemoteExplorer(*clientSet, *config, opt)
+	remoteEx := explorer.NewRemoteExplorer(*clientSet, *config, itopt)
 	profile, err := remoteEx.Probe()
 	if err != nil {
 		return err
 	}
-	err = remoteEx.Attach(profile, opt.Namespace, opt.Image, opt.Shell)
+	err = remoteEx.Attach(profile, itopt.Namespace, itopt.Image, itopt.Shell)
 	if err != nil {
 		return err
 	}

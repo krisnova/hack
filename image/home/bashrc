@@ -1,4 +1,4 @@
-#!/bin/bin
+#!/bin/bash
 #
 #
 #
@@ -83,7 +83,7 @@ klog(){
     kubectl logs $(echo $PO | cut -d " " -f 2) -n $(echo $PO | cut -d " " -f 1) -f
 }
 
-. /root/probe.sh
+. /root/welcome.sh
 
 
 
