@@ -51,7 +51,6 @@
 # [ENVIRONMENTAL VARIABLES]
 # -------------------------
 
-export EDITOR=/usr/bin/emacs
 export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
 export PS1="\[\033[38;5;12m\][\[$(tput sgr0)\]\[\033[38;5;10m\]\u\[$(tput sgr0)\]\[\033[38;5;12m\]@\[$(tput sgr0)\]\[\033[38;5;7m\]\h\[$(tput sgr0)\]\[\033[38;5;12m\]]\[$(tput sgr0)\]\[\033[38;5;15m\]: \[$(tput sgr0)\]\[\033[38;5;7m\]\w\[$(tput sgr0)\]\[\033[38;5;12m\]>\[$(tput sgr0)\]\[\033[38;5;10m\]\\$\[$(tput sgr0)\]\[\033[38;5;15m\] \[$(tput sgr0)\]"
 [ -e "/etc/DIR_COLORS" ] && DIR_COLORS="/etc/DIR_COLORS"
@@ -63,25 +62,13 @@ eval "`dircolors -b $DIR_COLORS`"
 # [VARS]
 # -------------------------
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
 # -------------------------
 # [SYSTEM]
 # -------------------------
 
-#ulimit -n 2048
-#ssh-add ~/.ssh/id_rsa
-
-
 # -------------------------
 # [FUNCTIONS]
 # -------------------------
-
-# Convenience log scrapper for k8s
-klog(){
-    PO=$(kubectl get po --all-namespaces | grep $1)
-    kubectl logs $(echo $PO | cut -d " " -f 2) -n $(echo $PO | cut -d " " -f 1) -f
-}
 
 . /root/welcome.sh
 

@@ -12,11 +12,7 @@ echo "Kris Nóva <kris@nivenly.com>"
 echo ""
 echo "Use at your own risk."
 echo "-----------------------------------------"
-/bin/date
-echo ""
-/usr/bin/landscape-sysinfo
 echo ""
 echo ""
-arp -e
-echo ""
+echo "$ hostenter [used to target pid 1 namespaces and enter]"
 echo ""

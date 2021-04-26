@@ -1,0 +1,6 @@
+#!/bin/bash
+REPO="krisnova"
+NAME="hack"
+TAG="latest"
+SHA="$(git rev-parse HEAD)"
+

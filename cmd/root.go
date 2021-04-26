@@ -1,5 +1,5 @@
 /*
-Copyright © 2020 NAME HERE <EMAIL ADDRESS>
+Copyright © 2020-2021 Kris Nóva <kris@nivenly.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -38,11 +38,13 @@ var rootCmd = &cobra.Command{
 
 
 -------------------------------------------------------------------------------
-Use hack to debug, explore, exploit and otherwise own a Kubernetes cluster.
+Use hack to debug, explore, and audit a Kubernetes cluster.
 -------------------------------------------------------------------------------
 
-[EXAMPLES]
- hack it # Will run the default "hack" image in Kubernetes and exec into the pod
+[Example]
+ [user@laptop] $: hack it 
+ [root@a3c9h72] $: hostenter
+ [root@ip-172.17.2.243] $: cat /etc/kubernetes/admin.conf
 `,
 
 	//	Run: func(cmd *cobra.Command, args []string) { },

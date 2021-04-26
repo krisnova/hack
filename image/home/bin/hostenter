@@ -1,4 +1,4 @@
-##!/bin/bash
+#!/bin/bash
 #
 #Usage:
 # nsenter [options] [<program> [<argument>...]]
@@ -27,3 +27,11 @@
 # -V, --version          display version
 #
 #For more details see nsenter(1).
+
+nsenter \
+  --target 1 \
+  --mount \
+  --uts \
+  --ipc \
+  --net \
+  -- /bin/bash

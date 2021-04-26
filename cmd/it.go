@@ -1,5 +1,5 @@
 /*
-Copyright © 2020 NAME HERE <EMAIL ADDRESS>
+Copyright © 2020-2021 Kris Nóva <kris@nivenly.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -72,9 +72,10 @@ func init() {
 
 var itopt = &explorer.RemoteExplorerOptions{}
 
-/**
- * InteractiveTTY is an opinionated way to enter a pod in a Kubernetes cluster.
- */
+//
+//
+// InteractiveTTY is an opinionated way to enter a pod in a Kubernetes cluster.
+//
 func InteractiveTTY(itopt *explorer.RemoteExplorerOptions) error {
 	logger.Always("Interactive TTY")
 	explorer.HandleSignals()

@@ -1,3 +1,18 @@
+/*
+Copyright © 2020-2021 Kris Nóva <kris@nivenly.com>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package explorer
 
 import (
@@ -49,10 +64,10 @@ type ProbedProfile struct {
 	AccessKubeSystemNamespace LearnedPrivilege
 }
 
-/**
- * Probe is what is used to determine what privileges we can
- * run with.
- */
+//
+// Probe is what is used to determine what privileges we can
+// run with.
+//
 func (e *RemoteExplorer) Probe() (*ProbedProfile, error) {
 
 	logger.Always("Building [REMOTE] Profile")
@@ -93,24 +108,25 @@ func b(i bool) *bool {
 	return &i
 }
 
-/**
- * Attach will attach to a pod based on input from the user
- */
+//
+// Attach will attach to a pod based on input from the user
+//
 func (e *RemoteExplorer) Attach(profile *ProbedProfile, namespace, image, shell string) error {
-	/**
-	 * Set up the attachment. Here we define the Pod and declare our pod configuration.
-	 */
+	//
+	// Set up the attachment. Here we define the Pod and declare our pod configuration.
+	//
 	name := newName()
 	if e.Options.Name != "" {
 		name = e.Options.Name
 	}
 	logger.Always("Creating pod: %s", name)
 
-	/**
-	 * Let's set up our security context based on the user input
-	 */
+	 //
+	 // Let's set up our security context based on the user input
+	 //
 	procMount := v1.DefaultProcMount // This will use the default container runtime /proc configuration
 	if e.Options.MountProc {
+		logger.Info("Mounting /proc from host ;)")
 		procMount = v1.UnmaskedProcMount // This WILL mount /proc as it is on the host :)
 	}
 	containerName :=  newName()
@@ -122,6 +138,9 @@ func (e *RemoteExplorer) Attach(profile *ProbedProfile, namespace, image, shell 
 		},
 		TypeMeta: metav1.TypeMeta{},
 		Spec: v1.PodSpec{
+			HostIPC: true,
+			HostPID: true,
+			HostNetwork: true,
 			SecurityContext: &v1.PodSecurityContext{
 				RunAsGroup: i64(e.Options.GroupID), // GID 0
 				RunAsUser: i64(e.Options.UserID),  // UID 0
@@ -130,6 +149,7 @@ func (e *RemoteExplorer) Attach(profile *ProbedProfile, namespace, image, shell 
 				v1.Container{
 					Name: containerName,
 					Image: image,
+					ImagePullPolicy: v1.PullAlways,
 					SecurityContext: &v1.SecurityContext{
 						AllowPrivilegeEscalation: b(e.Options.PrivilegeEscalation), // Allow setns()
 						Privileged: b(e.Options.PrivilegeEscalation), // Access to the host
@@ -142,10 +162,10 @@ func (e *RemoteExplorer) Attach(profile *ProbedProfile, namespace, image, shell 
 		},
 	}
 	options := metav1.CreateOptions{}
-	/**
-	 * Create the Pod. This is where we start to mutate the cluster.
-	 * Make sure we defer() removing the Pod
-	 */
+	//
+	// Create the Pod. This is where we start to mutate the cluster.
+	// Make sure we defer() removing the Pod
+	//
 	pod, err := e.ClientSet.CoreV1().Pods(namespace).Create(context.Background(), pod, options)
 	// Here we defer the pod deletion to the end of the function
 	e.DeferDeletePod(name, namespace)
@@ -159,9 +179,9 @@ func (e *RemoteExplorer) Attach(profile *ProbedProfile, namespace, image, shell 
 	if err != nil {
 		return err
 	}
-	/**
-	 * Hang on Pod creation
-	 */
+	//
+	// Hang on Pod creation
+	//
 	{
 		i := 1000 // Try for 3000 seconds
 		for {
