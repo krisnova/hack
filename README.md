@@ -1,14 +1,16 @@
 # hack
 
-a very serious grown up business tool for doing important kubernetes container boops
+This is a Kubernetes exploit and container breakout tool.
 
-use this tool to easily access things in your kubernetes
+The philosophy behind the tool is to give myself (and maybe others?) an easy to use platform to build and develop Kubernetes security tooling (specifically testing).
 
-find and discover the kubernetes things
+This tool is designed to do things most users will never need (and probably shouldn't do).
 
-very serious grown-ups allowed only exceptional
+Please use this tool responsibly and with caution. We keep all of our findings ethical and practice responsible disclosure. 
 
-# examples
+More information, bugs or to get involved [kris@nivenly.com](mailto:kris@nivenly.com)
+
+# example
 
 ```bash
 [nova@emily] $: git clone git@github.com:kris-nova/hack.git
