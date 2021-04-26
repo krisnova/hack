@@ -45,6 +45,10 @@ func HandleSignals() {
 			case syscall.SIGINT:
 				logger.Critical("SIGINT")
 				logger.Critical("Shutting down...")
+				if Recieved {
+					os.Exit(1)
+				}
+				Recieved = true
 				BreakNow = true
 			case syscall.SIGTERM:
 				logger.Critical("SIGTERM")
