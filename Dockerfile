@@ -1,10 +1,7 @@
 FROM krisnova/novix:latest
-
-COPY image/home/bashrc /root/.bashrc
-COPY image/home /root/
+WORKDIR /root
+COPY filesystem/home/bashrc /root/.bashrc
+COPY filesystem/home /root/
 RUN rm -f /root/bashrc
-COPY . /hack
-
-RUN cd /hack && make && make install
-
+COPY . /root/hack/
 CMD exec /bin/bash -c "trap : TERM INT; sleep infinity & wait"

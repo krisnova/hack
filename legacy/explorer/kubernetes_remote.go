@@ -17,7 +17,12 @@ package explorer
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"math/rand"
+	"os"
+	"time"
+
 	"github.com/kris-nova/logger"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -25,42 +30,50 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/remotecommand"
-	"math/rand"
-	"os"
-	"time"
 )
 
 type RemoteExplorerOptions struct {
 	KubeconfigPath string
-	Namespace string
-	Image string
-	Shell string
-	GroupID int
-	UserID int
+	Namespace      string
+	Image          string
+	Shell          string
+	Name           string
+
+	// ----------------------
+	// [  Security Section  ]
+	//
+	MountProc           bool
 	PrivilegeEscalation bool
-	MountProc bool
-	Name string
+	HostNetwork         bool
+	HostIPC             bool
+	HostPID             bool
+	GroupID             int
+	UserID              int
+
+	//
+	// ----------------------
+
 }
 
 type RemoteExplorer struct {
 	ClientSet kubernetes.Clientset
-	Config rest.Config
-	Options *RemoteExplorerOptions
+	Config    rest.Config
+	Options   *RemoteExplorerOptions
 }
 
-func NewRemoteExplorer (clientSet kubernetes.Clientset, config rest.Config, options *RemoteExplorerOptions) *RemoteExplorer{
+func NewRemoteExplorer(clientSet kubernetes.Clientset, config rest.Config, options *RemoteExplorerOptions) *RemoteExplorer {
 	return &RemoteExplorer{
 		ClientSet: clientSet,
-		Config: config,
-		Options: options,
+		Config:    config,
+		Options:   options,
 	}
 }
 
 type LearnedPrivilege bool
 
 type ProbedProfile struct {
-	ClusterName string
-	Nodes []v1.Node
+	ClusterName               string
+	Nodes                     []v1.Node
 	AccessKubeSystemNamespace LearnedPrivilege
 }
 
@@ -92,7 +105,7 @@ func (e *RemoteExplorer) Probe() (*ProbedProfile, error) {
 	if err != nil {
 		profile.AccessKubeSystemNamespace = false
 		logger.Warning("[AccessKubeSystemNamespace] DENIED")
-	}else {
+	} else {
 		profile.AccessKubeSystemNamespace = true
 		logger.Success("[AccessKubeSystemNamespace] GRANTED")
 	}
@@ -121,44 +134,45 @@ func (e *RemoteExplorer) Attach(profile *ProbedProfile, namespace, image, shell 
 	}
 	logger.Always("Creating pod: %s", name)
 
-	 //
-	 // Let's set up our security context based on the user input
-	 //
+	//
+	// Let's set up our security context based on the user input
+	//
 	procMount := v1.DefaultProcMount // This will use the default container runtime /proc configuration
 	if e.Options.MountProc {
-		logger.Info("Mounting /proc from host ;)")
+		logger.Success("Mounting /proc from host.")
 		procMount = v1.UnmaskedProcMount // This WILL mount /proc as it is on the host :)
 	}
-	containerName :=  newName()
+
+	containerName := newName()
 	logger.Always("Container name: %s", name)
 	pod := &v1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: namespace,
-			Name: name,
+			Name:      name,
 		},
 		TypeMeta: metav1.TypeMeta{},
 		Spec: v1.PodSpec{
-			HostIPC: true,
-			HostPID: true,
-			HostNetwork: true,
+			HostIPC:     e.Options.HostIPC,
+			HostPID:     e.Options.HostPID,
+			HostNetwork: e.Options.HostNetwork,
 			SecurityContext: &v1.PodSecurityContext{
 				RunAsGroup: i64(e.Options.GroupID), // GID 0
-				RunAsUser: i64(e.Options.UserID),  // UID 0
+				RunAsUser:  i64(e.Options.UserID),  // UID 0
 			},
-		Containers: []v1.Container{
+			Containers: []v1.Container{
 				v1.Container{
-					Name: containerName,
-					Image: image,
+					Name:            containerName,
+					Image:           image,
 					ImagePullPolicy: v1.PullAlways,
 					SecurityContext: &v1.SecurityContext{
 						AllowPrivilegeEscalation: b(e.Options.PrivilegeEscalation), // Allow setns()
-						Privileged: b(e.Options.PrivilegeEscalation), // Access to the host
-						RunAsGroup: i64(e.Options.GroupID), // GID 0
-						RunAsUser: i64(e.Options.UserID),  // UID 0
-						ProcMount: &procMount, // Defined above the /proc permissions
+						Privileged:               b(e.Options.PrivilegeEscalation), // Access to the host
+						RunAsGroup:               i64(e.Options.GroupID),           // GID 0
+						RunAsUser:                i64(e.Options.UserID),            // UID 0
+						ProcMount:                &procMount,                       // Defined above the /proc permissions
 					},
 				},
-		},
+			},
 		},
 	}
 	options := metav1.CreateOptions{}
@@ -205,6 +219,9 @@ func (e *RemoteExplorer) Attach(profile *ProbedProfile, namespace, image, shell 
 			continue
 		}
 	}
+	{
+	}
+
 	logger.Always("Attaching to pod: %s", name)
 	cmd := []string{
 		shell,
@@ -223,7 +240,20 @@ func (e *RemoteExplorer) Attach(profile *ProbedProfile, namespace, image, shell 
 	)
 	exec, err := remotecommand.NewSPDYExecutor(&e.Config, "POST", request.URL())
 	if err != nil {
-		return err
+
+		// If we hit an error, most likely the cluster has rejected
+		// our request -- let's let the user know what happened
+		pod, err2 := e.ClientSet.CoreV1().Pods(namespace).Get(context.Background(), name, metav1.GetOptions{})
+		if err2 != nil {
+			return fmt.Errorf("Error executing pod %v: Error finding error: %v", err, err2)
+		}
+		jsonBytes, err2 := json.Marshal(pod)
+		if err != nil {
+			return fmt.Errorf("Error executing pod: %v Error JSON: %v", err, err2)
+		}
+		podStr := string(jsonBytes)
+		logger.Debug(podStr)
+		return fmt.Errorf("Error executing pod: %v \n\n %s", podStr)
 	}
 	err = exec.Stream(remotecommand.StreamOptions{
 		Stdin:  os.Stdin,

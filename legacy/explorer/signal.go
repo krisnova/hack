@@ -17,11 +17,12 @@ package explorer
 
 import (
 	"context"
-	"github.com/kris-nova/logger"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/kris-nova/logger"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 var BreakNow = false
@@ -67,12 +68,14 @@ func HandleSignals() {
 
 func (e *RemoteExplorer) DeferDeletePod(name, namespace string) {
 	go func() {
-		for !BreakNow {}
+		for !BreakNow {
+		}
 		logger.Always("Deleting pod: %s", name)
 		err := e.ClientSet.CoreV1().Pods(namespace).Delete(context.Background(), name, metav1.DeleteOptions{})
 		if err != nil {
 			logger.Warning("Error deleting pod: %v", err)
 		}
+		os.Exit(0)
 	}()
 
 }

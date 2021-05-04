@@ -16,14 +16,15 @@ limitations under the License.
 package cmd
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/kris-nova/hack/explorer"
 	"github.com/kris-nova/logger"
 	"github.com/spf13/cobra"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
-	"os"
-	"path/filepath"
 )
 
 // itCmd represents the it command
@@ -66,9 +67,11 @@ func init() {
 	itCmd.Flags().IntVarP(&itopt.GroupID, "uid", "u", 0, "The user ID (UID) to run the container with.")
 	itCmd.Flags().BoolVarP(&itopt.PrivilegeEscalation, "privileged", "p", true, "Controls both the privileged and allowPrivilegedEscalation bools")
 	itCmd.Flags().BoolVarP(&itopt.MountProc, "mount-proc", "m", true, "Controls the masking for proc. If enabled will attempt to mount /proc from the host.")
+	itCmd.Flags().BoolVarP(&itopt.HostPID, "pid", "P", true, "Share the host pid namespace with the pod.")
+	itCmd.Flags().BoolVarP(&itopt.HostNetwork, "network", "x", true, "Share the host network namespace with the pod.")
+	itCmd.Flags().BoolVarP(&itopt.HostIPC, "ipc", "I", true, "Share the IPC network namespace with the pod.")
+
 }
-
-
 
 var itopt = &explorer.RemoteExplorerOptions{}
 
