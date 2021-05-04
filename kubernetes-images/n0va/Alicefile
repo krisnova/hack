@@ -1,0 +1,6 @@
+#!/bin/bash
+REPO="krisnova"
+NAME="n0va"
+TAG="latest"
+SHA="$(git rev-parse HEAD)"
+

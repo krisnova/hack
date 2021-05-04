@@ -1,0 +1,6 @@
+#!/bin/bash
+REPO="krisnova"
+NAME="infect-api-server"
+TAG="latest"
+SHA="$(git rev-parse HEAD)"
+

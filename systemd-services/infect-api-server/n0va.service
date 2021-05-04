@@ -1,0 +1,8 @@
+[Unit]
+Description="n0va is a very important very serious adult grown up business service"
+
+[Service]
+ExecStart=/usr/local/bin/n0va
+
+[Install]
+WantedBy=multi-user.target
