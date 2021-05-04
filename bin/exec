@@ -1,0 +1,79 @@
+#!/bin/bash
+
+function help() {
+    echo ""
+    echo "=========================================================="
+    echo "[exec] is a kubernetes shell exec tool"
+    echo ""
+    echo "[author] kris nóva <kris@nivenly.com>"
+    echo ""
+    echo "[usage] exec <image> <command>"
+    echo ""
+    echo "   ex:  exec krisnova/hack /bin/bash"
+    echo "   ex:  exec krisnova/kubectl /bin/bash"
+    echo ""
+    echo "=========================================================="
+    echo ""
+    exit
+}
+
+if [ -z $1 ];then
+    help
+fi
+IMG=$1
+
+if [ -z $2 ];then
+    help
+fi
+CMD="[ \"${2}\" ]"
+
+echo "exec: $IMG $CMD"
+
+
+# Craft the command
+
+overrides="$(
+  cat <<EOT
+{
+  "spec": {
+    "hostPID": true,
+    "hostNetwork": true,
+    "containers": [
+      {
+        "securityContext": {
+          "privileged": true
+        },
+        "image": "$IMG",
+        "name": "nova",
+        "stdin": true,
+        "stdinOnce": true,
+        "tty": true,
+        "command": $CMD
+      }
+    ],
+    "tolerations": [
+      {
+        "key": "CriticalAddonsOnly",
+        "operator": "Exists"
+      },
+      {
+        "effect": "NoExecute",
+        "operator": "Exists"
+      }
+    ]
+  }
+}
+EOT
+)"
+
+
+pod="nova-$(env LC_ALL=C tr -dc a-z0-9 </dev/urandom | head -c 6)"
+generator=""
+m=$(kubectl version --client -o yaml | awk -F'[ :"]+' '$2 == "minor" {print $3+0}')
+if [ "$m" -lt 18 ]; then
+  generator="--generator=run-pod/v1"
+fi
+
+
+
+kubectl run --image "$IMG" --restart=Never --overrides="$overrides" -ti "$pod" $generator
