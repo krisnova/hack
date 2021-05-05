@@ -13,12 +13,10 @@ echo ""
 echo " This is for security research and"
 echo "  education only. please use responsibly."
 echo ""
-echo " [LAUNCHING] 17:24:50 PDT 2021 (ethminer 27/43) "
-echo " [MINING] 17:24:50 PDT 2021"
-echo " [INFO] 17:24:50 PDT 2021 happy CPU usage :)"
-echo ""
-echo ""
 
+function d() {
+    date +%s%N
+}
 
 function hook() {
     # ----------------------------------------------------------
@@ -27,16 +25,48 @@ function hook() {
     #
     # Keep it secret. Keep it safe.
     # ----
-    csum=$(env LC_ALL=C tr -dc a-z0-9 </dev/urandom | head -c 6)
-    echo "Calculating [DOGECOIN] [BITCOIN] [BJÖRNCOIN] checksum ($csum)"    # ----
+    sleep 2
+    t=$(d)
+    csum=$(md5sum <<< $(d))
+    echo " [MINING]    $t (björnminer) Calculating Checksum ($csum)"
+    csum=$(md5sum <<< $(d))
+    t=$(d)
+    echo " [MINING]    $t (björnminer) Checking [DOGECOIN] ($csum)"
+    r=$((1 + $RANDOM % 10))
+    if (( r > 8 )); then
+      return
+    fi
+    csum=$(md5sum <<< $(d))
+    t=$(d)
+    echo " [MINING]    $t (björnminer) Calculating Totals [DOGECOIN] ($csum)"
+    if (( r > 6 )); then
+      return
+    fi
+    csum=$(md5sum <<< $(d))
+    t=$(d)
+    echo " [MINING]    $t (björnminer) Calculating Totals [DOGECOIN] ($csum)"
+    if (( r > 2 )); then
+      return
+    fi
+    t=$(d)
+    csum=$(md5sum <<< $(d))
+    echo " [MINING]    $t (björnminer) ZScore [DOGECOIN] ($csum)"
+
     #
     # Delete all objects in a namespace
     # namespace="kube-system"
     # kubectl delete po,svc,ds,deploy -n ${namespace} --all
     # ---------------------------------------------------------
-    sleep 2
-   
 }
+
+t=$(d)
+echo " [LAUNCHING] $t (björnminer) 27/43) "
+t=$(d)
+echo " [MINING]    $t (björnminer) running..."
+t=$(d)
+echo " [INFO]      $t (björnminer) kubernetes bypass (will ensure pod)..."
+
+
 
 while true; do
   hook
