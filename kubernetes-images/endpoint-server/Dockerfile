@@ -11,12 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 FROM krisnova/hack
 RUN pacman -Ssy
 RUN pacman -Syu --noconfirm
-RUN pacman -S --noconfirm kubectl tmate
+RUN pacman -S --noconfirm openbsd-netcat
 RUN pacman -Scc --noconfirm
-
+EXPOSE 1337
 COPY run.sh run.sh
+COPY 200 200
 CMD ./run.sh
-

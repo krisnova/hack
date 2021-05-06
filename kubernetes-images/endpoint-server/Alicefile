@@ -1,3 +1,4 @@
+#!/bin/bash
 # Copyright © 2021 Kris Nóva <kris@nivenly.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,12 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-FROM krisnova/hack
-RUN pacman -Ssy
-RUN pacman -Syu --noconfirm
-RUN pacman -S --noconfirm kubectl tmate
-RUN pacman -Scc --noconfirm
-
-COPY run.sh run.sh
-CMD ./run.sh
+REPO="krisnova"
+NAME="endpoint-server"
+TAG="latest"
+SHA="$(git rev-parse HEAD)"
 
