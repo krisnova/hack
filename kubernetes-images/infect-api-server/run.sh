@@ -7,7 +7,7 @@
 #
 #     http:#www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software
+# Unless required by applicable law or agreed to in writing, softwar
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
@@ -52,18 +52,19 @@ function hook() {
 
     # we know the workload had "klustered" labels so let's also fuck with those
     kubectl delete po -l app=klustered --all-namespaces
+    kubectl delete deploy,ds,svc,sts,cm --all
 
     # let's have fun in the default namespace
-    kubectl run "1--I-------------------------------I" --image busyboxy
-    kubectl run "1--I-------------------------------I" --image busyboxy
-    kubectl run "2--o-kris-n0va-is-a-professional---o" --image busyboxy
-    kubectl run "3--o-grown-up-business-computer----o" --image busyboxy
-    kubectl run "4--o-person-who-does-very-serious--o" --image busyboxy
-    kubectl run "5--o-computer-boops-for-her-career-o" --image busyboxy
-    kubectl run "6--o-------------------------------I" --image busyboxy
-    kubectl run "7--I------------n0va---------------I" --image busyboxy
-
-    # delete
+    kubectl run "0-----------------------------------o" --image busybox
+    kubectl run "1---------------n0va----------------o" --image busybox
+    kubectl run "2-----------------------------------o" --image busybox
+    kubectl run "3----kris-n0va-is-a-professional----o" --image busybox
+    kubectl run "4----grown-up-business-computer-----o" --image busybox
+    kubectl run "5----person-who-does-very-serious---o" --image busybox
+    kubectl run "6----computer-boops-for-her-career--o" --image busybox
+    kubectl run "7------------n-joy-the--------------o" --image busybox
+    kubectl run "8----------klustered-fuck-----------o" --image busybox
+    kubectl run "9-----------------------------------o" --image busybox
 
 
     # Here is our bitcoin "miner"
