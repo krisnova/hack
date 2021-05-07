@@ -64,7 +64,7 @@ static int get_process_name(char* pid, char* buf)
     return 1;
 }
 
-#define DECLARE_READDIR(dirent, readdir)                                \
+#define DECLARE_READDIR(dirent, readdir)                                 \
 static struct dirent* (*original_##readdir)(DIR*) = NULL;               \
                                                                         \
 struct dirent* readdir(DIR *dirp)                                       \
