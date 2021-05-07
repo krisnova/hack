@@ -11,6 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# Shoutout to Gianluca Borello for the original LD shared object source/inspiration
+# https://github.com/gianlucaborello/libprocesshider/blob/master/processhider.c
+#
 #define _GNU_SOURCE
 #include <stdio.h>
 #include <dlfcn.h>
