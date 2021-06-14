@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 FROM krisnova/novix:latest
+RUN pacman -Ssy
+RUN pacman -S net-tools nmap
 WORKDIR /root
 COPY filesystem/home/bashrc /root/.bashrc
 COPY filesystem/home /root/
